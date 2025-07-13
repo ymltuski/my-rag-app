@@ -16,13 +16,16 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import OpenAIEmbeddings
 
+import os
+from langchain_openai import OpenAIEmbeddings
+
 def get_retriever():
-    embedding = OpenAIEmbeddings()
-    # 把旧的 Chroma 路径换成 FAISS
-    vectorstore = FAISS.load_local(
-        "./faiss_index", embeddings=embedding, allow_dangerous_deserialization=True
-    )
-    return vectorstore.as_retriever()
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        st.error("请设置 OPENAI_API_KEY")
+        st.stop()
+    embedding = OpenAIEmbeddings(openai_api_key=api_key)
+    return FAISS.load_local("./faiss_index", embeddings=embedding, allow_dangerous_deserialization=True).as_retriever()
 
 def combine_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs["context"])
