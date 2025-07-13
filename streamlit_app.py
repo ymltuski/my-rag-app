@@ -13,18 +13,16 @@ from zhipuai_embedding import ZhipuAIEmbeddings
 from langchain_community.vectorstores import Chroma
 
 # ---------- 工具函数 ----------
-import os
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
 
 def get_retriever():
-    api_key = os.getenv("ZHIPU_API_KEY")
-    if not api_key:
-        st.error("请设置 ZHIPU_API_KEY")
-        st.stop()
-    
-    embedding = ZhipuAIEmbeddings(api_key=api_key)
-    persist_directory = './chroma_db'
-    vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding)
-    return vectordb.as_retriever()
+    embedding = OpenAIEmbeddings()
+    # 把旧的 Chroma 路径换成 FAISS
+    vectorstore = FAISS.load_local(
+        "./faiss_index", embeddings=embedding, allow_dangerous_deserialization=True
+    )
+    return vectorstore.as_retriever()
 
 def combine_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs["context"])
