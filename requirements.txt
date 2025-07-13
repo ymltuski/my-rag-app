@@ -12,3 +12,9 @@ zhipuai
 chromadb
 langchain-community
 faiss-cpu
+streamlit
+langchain
+langchain-openai
+langchain-community
+openai
+faiss-cpu
