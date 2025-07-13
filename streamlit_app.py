@@ -13,9 +13,16 @@ from zhipuai_embedding import ZhipuAIEmbeddings
 from langchain_community.vectorstores import Chroma
 
 # ---------- 工具函数 ----------
+import os
+
 def get_retriever():
-    embedding = ZhipuAIEmbeddings()
-    persist_directory = '/workspaces/test_codespace/A_Test/A_test/my_modules/chroma_db'
+    api_key = os.getenv("ZHIPU_API_KEY")
+    if not api_key:
+        st.error("请设置 ZHIPU_API_KEY")
+        st.stop()
+    
+    embedding = ZhipuAIEmbeddings(api_key=api_key)
+    persist_directory = './chroma_db'
     vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding)
     return vectordb.as_retriever()
 
